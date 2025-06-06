@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.InstructionsController">
+    <children>
+        <Label prefHeight="53.0" prefWidth="230.0" text="Marlon Escape" textAlignment="CENTER">
+            <VBox.margin>
+                <Insets left="190.0" top="15.0" />
+            </VBox.margin>
+            <font>
+                <Font name="Copperplate Gothic Bold" size="24.0" />
+            </font>
+        </Label>
+        <TextArea prefHeight="276.0" prefWidth="600.0" text="🎯 Objetivo:&#10;&#10;Eres un estudiante promedio y tu misión es escapar del campus &#10;universitario antes de que:&#10;&#10;El profesor Marlon te atrape&#10;&#10;Se te acabe la puntuación&#10;&#10;O tu nota final sea menor a 3.0&#10;&#10;&#10;🗺 ¿Cómo se juega?&#10;&#10;El campus es un laberinto representado como un grafo &#10;(mapa con habitaciones conectadas).&#10;&#10;Cada nodo (habitación) puede tener:&#10;&#10;🔺 Trampa: pierdes puntos y turno.&#10;&#10;💡 Pista: te muestra la mejor ruta a la salida.&#10;&#10;🌟 Especial: con mayor probabilidad de tener trampas o pistas.&#10;&#10;Te mueves por turnos. Cada movimiento cuesta puntos.&#10;&#10;Marlon se mueve también... ¡y te está buscando!&#10;&#10;&#10;⚠ Regla de oro:&#10;&#10;Si Marlon y tú están en la misma habitación. PIERDES.&#10;&#10;Si llegas a la salida con una nota menor a 3.0. PIERDES.&#10;&#10;Si tu puntuación llega a cero o menos. PIERDES.&#10;&#10;&#10;🧠 Consejos:&#10;&#10; - Piensa bien cada paso.&#10;&#10; - Evita trampas.&#10;&#10; - Aprovecha las pistas.&#10;&#10; - Marlon usará su astucia para alcanzarte cada 2 turnos.&#10;&#10;&#10;🏁 Final del juego:&#10;&#10;Nota ≥ 4.5: “¡Escape perfecto! Tu promedio se alzó.”&#10;&#10;Nota entre 3.0 y 4.4: “Sobreviviste... raspando.”&#10;&#10;Nota &lt; 3.0: “Ven te doy una charla TED”">
+            <font>
+                <Font name="Arial" size="15.0" />
+            </font>
+            <VBox.margin>
+                <Insets top="13.0" />
+            </VBox.margin>
+        </TextArea>
+        <Button fx:id="okeyButton" mnemonicParsing="false" onAction="#closeWindow" style="-fx-background-color: blue;" text="JUGAR" textFill="#f5f5f5">
+            <font>
+                <Font name="Impact" size="20.0" />
+            </font>
+            <VBox.margin>
+                <Insets bottom="15.0" left="253.0" top="10.0" />
+            </VBox.margin>
+        </Button>
+    </children>
+</VBox>
