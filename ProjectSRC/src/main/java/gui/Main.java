@@ -8,14 +8,15 @@ import javafx.stage.Stage;
 
 import java.net.URL;
 
+
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
         try {
-            URL instructionsUrl = getClass().getResource("/fxml/instructions_view.fxml");
+            URL instructionsUrl = getClass().getResource("/fxml/InstructionsView.fxml");
             if (instructionsUrl == null) {
-                throw new IllegalStateException("¡Archivo instructions_view.fxml no encontrado!");
+                throw new IllegalStateException("¡Archivo InstructionsView.fxml no encontrado!");
             }
 
             FXMLLoader instructionLoader = new FXMLLoader(instructionsUrl);

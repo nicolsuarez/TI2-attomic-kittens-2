@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controller.MapController">
+
+    <center>
+        <Canvas fx:id="mapCanvas" width="800" height="600" />
+    </center>
+
+    <bottom>
+        <HBox spacing="10" alignment="center">
+            <Button fx:id="moveUpBtn" text="↑" />
+            <Button fx:id="moveLeftBtn" text="←" />
+            <Button fx:id="moveRightBtn" text="→" />
+            <Button fx:id="moveDownBtn" text="↓" />
+        </HBox>
+    </bottom>
+
+</BorderPane>
