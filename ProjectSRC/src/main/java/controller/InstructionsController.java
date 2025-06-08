@@ -30,7 +30,7 @@ public class InstructionsController {
 
             Stage mapStage = new Stage();
             mapStage.setTitle("Mapa del Juego");
-            mapStage.setScene(new Scene(root, 900, 800));
+            mapStage.setScene(new Scene(root, 1200, 900));
             mapStage.initStyle(StageStyle.DECORATED);
             mapStage.setResizable(true);
             mapStage.show();

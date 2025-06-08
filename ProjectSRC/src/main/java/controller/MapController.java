@@ -37,7 +37,7 @@ public class MapController {
             gc = mapCanvas.getGraphicsContext2D();
 
             loadMapFromJson();
-            assignAutomaticPositions();
+            assignManualPositions();
             drawGraph();
 
             System.out.println("Mapa dibujado correctamente");
@@ -133,20 +133,80 @@ public class MapController {
         }
     }
 
-    private void assignAutomaticPositions() {
-        graphicPositions = new HashMap<>();
-        int cols = 8;
-        int spacing = 90;
-        int xStart = 50;
-        int yStart = 50;
+    private double[] getFixedPosition(String name) {
+        return switch (name) {
+            case "aa" -> new double[]{50, 50};
+            case "auditorio" -> new double[]{164.2, 50};
+            case "ac" -> new double[]{278.4, 50};
+            case "ad" -> new double[]{400,50};
+            case "cafeteria_2" -> new double[]{525,50};
+            case "af" -> new double[]{637.5,50};
+            case "ag" -> new double[]{750,50};
+            // ----------------------------------
+            case "zonaVerde_1" -> new double[]{50, 150};
+            case "bb" -> new double[]{164.2, 150};
+            case "cafeteria_1" -> new double[]{278.4, 150};
+            case "bd" -> new double[]{400,150};
+            case "be" -> new double[]{525,150};
+            case "cafeteria_3" -> new double[]{637.5,150};
+            case "bg" -> new double[]{750,150};
+            // -----------------------------------
+            case "ca" -> new double[]{50, 250};
+            case "cb" -> new double[]{164.2, 250};
+            case "cc" -> new double[]{278.4, 250};
+            case "cd" -> new double[]{400,250};
+            case "ce" -> new double[]{525,250};
+            case "cf" -> new double[]{637.5,250};
+            case "cg" -> new double[]{750, 250};
+            // ------------------------------------
+            case "da" -> new double[]{50, 350};
+            case "zonaVerde_2" -> new double[]{164.2, 350};
+            case "dc" -> new double[]{278.4, 350};
+            case "zonaVerde_3" -> new double[]{400, 350};
+            case "de" -> new double[]{525, 350};
+            case "df" -> new double[]{637.5, 350};
+            case "zonaVerde_4" -> new double[]{750,350};
+            // ------------------------------------
+            case "ea" -> new double[]{50, 450};
+            case "eb" -> new double[]{164.2, 450};
+            case "boreal" -> new double[]{278.4, 450};
+            case "ed" -> new double[]{400,450};
+            case "gym" -> new double[]{525,450};
+            case "ef" -> new double[]{637.5,450};
+            case "eg" -> new double[]{750,450};
+            //----------------------------------
+            case "fa" -> new double[]{50, 650};
+            case "biblioteca" -> new double[]{164.2, 650};
+            case "fc" -> new double[]{278.4, 650};
+            case "fd" -> new double[]{400, 650};
+            case "oficina_1" -> new double[]{525, 650};
+            case "ff" -> new double[]{637.5,650};
+            case "oficina_2" -> new double[]{750, 650};
+            case "oficina_3" -> new double[]{50, 650};
+            // ---------------------------------------
+            case "gb" -> new double[]{164.2, 750};
+            case "gc" -> new double[]{278.4, 750};
+            case "gd" -> new double[]{400, 750};
+            case "ge" -> new double[]{525, 750};
+            case "gf" -> new double[]{637.5, 750};
+            case "gg" -> new double[]{750, 750};
+            case "salida" -> new double[]{400, 850};
+            default -> null;
+        };
+    }
 
-        List<Node<Room>> nodes = graph.getNodes();
-        for (int i = 0; i < nodes.size(); i++) {
-            int row = i / cols;
-            int col = i % cols;
-            double x = xStart + col * spacing;
-            double y = yStart + row * spacing;
-            graphicPositions.put(nodes.get(i).getData(), new double[]{x, y});
+    private void assignManualPositions() {
+        graphicPositions = new HashMap<>();
+
+        for (Node<Room> node : graph.getNodes()) {
+            String name = node.getData().getName();
+            double[] pos = getFixedPosition(name);
+
+            if (pos != null) {
+                graphicPositions.put(node.getData(), pos);
+            } else {
+                graphicPositions.put(node.getData(), new double[]{50, 50});
+            }
         }
     }
 
