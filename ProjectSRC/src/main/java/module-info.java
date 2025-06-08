@@ -10,4 +10,5 @@ module game {
     exports model;
     exports controller;
     opens controller to javafx.fxml;
+    exports resources;
 }

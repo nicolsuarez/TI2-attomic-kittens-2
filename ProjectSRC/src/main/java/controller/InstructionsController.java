@@ -9,6 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class InstructionsController {
 
@@ -24,19 +25,21 @@ public class InstructionsController {
     @FXML
     void closeWindow(ActionEvent event) {
         try{
-            Stage currentStage = (Stage) okeyButton.getScene().getWindow();
-            currentStage.close();
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MapView.fxml"));
             Parent root = loader.load();
 
             Stage mapStage = new Stage();
             mapStage.setTitle("Mapa del Juego");
-            mapStage.setScene(new Scene(root));
-            mapStage.setResizable(false);
+            mapStage.setScene(new Scene(root, 900, 800));
+            mapStage.initStyle(StageStyle.DECORATED);
+            mapStage.setResizable(true);
             mapStage.show();
 
+            Stage currentStage = (Stage) okeyButton.getScene().getWindow();
+            currentStage.close();
+
         } catch (Exception e) {
+            System.out.println("Error al abrir el mapa");
             e.printStackTrace();
         }
     }
