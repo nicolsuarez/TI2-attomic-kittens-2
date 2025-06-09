@@ -146,6 +146,19 @@ public class MapController {
             gc.fillOval(pos[0], pos[1], 40, 40);
             gc.setFill(Color.BLACK);
             gc.fillText(room.getName(), pos[0], pos[1] + 55);
+
+            try {
+                if (room.isHasTrap()) {
+                    Image trapImg = new Image(getClass().getResourceAsStream("/imagen/005.png"));
+                    gc.drawImage(trapImg, pos[0] + 25, pos[1] + 5, 15, 15);
+                } else if (room.isHasClue()) {
+                    Image clueImg = new Image(getClass().getResourceAsStream("/imagen/006.png"));
+                    gc.drawImage(clueImg, pos[0] + 25, pos[1] + 5, 15, 15);
+                }
+            } catch (Exception e) {
+                System.err.println("No se pudo cargar la imagen de trampa o pista");
+                e.printStackTrace();
+            }
         }
 
         try {
@@ -254,6 +267,18 @@ public class MapController {
 
         playerMoves++;
         if (playerMoves % 2 == 0) moverMarlon();
+
+        if (destino.isHasTrap()) {
+            game.getPlayer().setScore(game.getPlayer().getScore() - 20);
+            System.out.println("¡Cayó en una trampa! -20 puntos");
+            destino.setHasTrap(false);
+        }
+
+        if (destino.isHasClue()) {
+            game.getPlayer().setScore(game.getPlayer().getScore() + 10);
+            System.out.println("¡Encontró una pista! +10 puntos");
+            destino.setHasClue(false);
+        }
     }
 
     private void moverMarlon() {

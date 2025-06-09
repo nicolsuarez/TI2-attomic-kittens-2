@@ -3,6 +3,8 @@ package model;
 import graphStructures.*;
 import resources.BuildMap;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class GameMap {
@@ -23,9 +25,25 @@ public class GameMap {
     }
 
     public void assignTrapsAndClues(int trapsNum, int cluesNum) {
-        /*
-        ADD THE LOGIC TO ASSIGN THE TRAPS AND CLUES ON THE MAP
-        */
+        List<Node<Room>> rooms = new ArrayList<>(graph.getNodes());
+        Collections.shuffle(rooms);
+
+        int trapCount = 0;
+        int clueCount = 0;
+        for (Node<Room> node : rooms) {
+            Room room = node.getData();
+            if (!room.isSpecial() && !room.isHasClue() && !room.isHasTrap()) {
+                if (trapCount < trapsNum) {
+                    room.setHasTrap(true);
+                    trapCount++;
+                } else if (clueCount < cluesNum) {
+                    room.setHasClue(true);
+                    clueCount++;
+                }
+
+                if (trapCount == trapsNum && clueCount == cluesNum) break;
+            }
+        }
     }
 
     public boolean isValidMove() {
