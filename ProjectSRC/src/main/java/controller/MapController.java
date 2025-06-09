@@ -216,7 +216,29 @@ public class MapController {
     }
 
     private void moverJugador(Room destino) {
+        Player player = game.getPlayer();
+        Room actual = player.getPosition();
 
+        if (actual.equals(destino)) return;
+
+        List<Room> vecinos = graph.getNeighbors(actual);
+        if (vecinos.contains(destino)) {
+            player.setPosition(destino);
+            turn++;
+
+            if (turn % 2 == 0) moverMarlon();
+
+            drawGraph();
+
+            if (destino.equals(game.getMarlon().getPosition())) {
+                System.out.println("Marlon atrapó al jugador");
+            }
+        } else {
+            System.out.println("Movimiento inválido");
+        }
+
+        playerMoves++;
+        if (playerMoves % 2 == 0) moverMarlon();
     }
 
     private void moverMarlon() {
