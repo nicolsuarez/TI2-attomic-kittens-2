@@ -8,6 +8,7 @@ import graphStructures.WeightedGraph;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import model.Game;
 import model.GameMap;
@@ -147,13 +148,23 @@ public class MapController {
             gc.fillText(room.getName(), pos[0], pos[1] + 55);
         }
 
-        double[] playerPos = graphicPositions.get(game.getPlayer().getPosition());
-        gc.setFill(Color.BLUE);
-        gc.fillOval(playerPos[0]+10, playerPos[1]+10, 20, 20);
+        try {
+            Image playerImg = new Image(getClass().getResourceAsStream("/imagen/student/002.png"));
+            double[] playerPos = graphicPositions.get(game.getPlayer().getPosition());
+            gc.drawImage(playerImg, playerPos[0] + 10, playerPos[1] + 10, 20, 20);
+        } catch (Exception e) {
+            System.err.println("No se pudo cargar la imagen del jugador");
+            e.printStackTrace();
+        }
 
-        double[] marlonPos = graphicPositions.get(game.getMarlon().getPosition());
-        gc.setFill(Color.RED);
-        gc.fillOval(marlonPos[0]+10, marlonPos[1]+10, 20, 20);
+        try {
+            Image marlonImg = new Image(getClass().getResourceAsStream("/imagen/marlon/001.png"));
+            double[] marlonPos = graphicPositions.get(game.getMarlon().getPosition());
+            gc.drawImage(marlonImg, marlonPos[0] + 10, marlonPos[1] + 10, 20, 20);
+        } catch (Exception e) {
+            System.err.println("No se pudo cargar la imagen de Marlon");
+            e.printStackTrace();
+        }
     }
 
     private double[] getFixedPosition(String name) {
