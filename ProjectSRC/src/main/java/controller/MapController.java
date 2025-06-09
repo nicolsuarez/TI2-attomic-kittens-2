@@ -1,5 +1,7 @@
 package controller;
 
+import auxiliarStructures.LinkedList;
+import graphStructures.Algorithms;
 import graphStructures.Edge;
 import graphStructures.Node;
 import graphStructures.WeightedGraph;
@@ -7,6 +9,9 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import model.Game;
+import model.GameMap;
+import model.Player;
 import model.Room;
 import resources.BuildMap;
 
@@ -23,12 +28,11 @@ public class MapController {
     private Canvas mapCanvas;
 
     private GraphicsContext gc;
+    private Game game;
     private WeightedGraph<Room> graph;
     private Map<Room, double[]> graphicPositions;
-    private Room playerPosition;
-    private Map<String, Room> roomsByName = new HashMap<>();
-
-
+    private int turn = 0;
+    private int playerMoves = 0;
 
     @FXML
     public void initialize() {
@@ -37,41 +41,45 @@ public class MapController {
             gc = mapCanvas.getGraphicsContext2D();
 
             loadMapFromJson();
+
+            game = new Game();
+            game.setMap(new GameMap(graph));
+            game.startGame();
+            graph = game.getMap().getGraph();
+
             assignManualPositions();
             drawGraph();
 
-            System.out.println("Mapa dibujado correctamente");
+            mapCanvas.setOnMouseClicked(event -> {
+                double clickX = event.getX();
+                double clickY = event.getY();
+
+                for (Room room : graphicPositions.keySet()) {
+                    double[] pos = graphicPositions.get(room);
+                    double dx = clickX - (pos[0] + 20);
+                    double dy = clickY - (pos[1] + 20);
+                    double distancia = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distancia <= 20) {
+                        moverJugador(room);
+                        break;
+                    }
+                }
+            });
+
+            System.out.println("Mapa cargado correctamente");
 
         } catch (Exception e) {
             System.err.println("ERROR en initialize()");
             e.printStackTrace();
         }
-
-        mapCanvas.setOnMouseClicked(event -> {
-            double clickX = event.getX();
-            double clickY = event.getY();
-
-            for (Room room : graphicPositions.keySet()) {
-                double[] pos = graphicPositions.get(room);
-                double dx = clickX - (pos[0] + 20);
-                double dy = clickY - (pos[1] + 20);
-                double distancia = Math.sqrt(dx * dx + dy * dy);
-
-                if (distancia <= 20) {
-                    intentarMoverJugador(room);
-                    break;
-                }
-            }
-        });
     }
 
     private void loadMapFromJson() {
         try {
-            System.out.println("Cargando JSON desde BuildMap");
-
             InputStream is = getClass().getResourceAsStream("/util/mapaJSON.json");
             if (is == null) {
-                throw new RuntimeException("No se encontró /util/mapaJSON.json");
+                throw new RuntimeException("No se encontró el archivo JSON");
             }
 
             File tempFile = File.createTempFile("mapa_temp", ".json");
@@ -82,15 +90,32 @@ public class MapController {
 
             graph = BuildMap.loadGraphFromJSON(tempFile.getAbsolutePath());
 
-            roomsByName.clear();
-            for (Node<Room> node : graph.getNodes()) {
-                roomsByName.put(node.getData().getName(), node.getData());
-            }
-
         } catch (Exception e) {
-            System.err.println("ERROR en loadMapFromJson()");
-            e.printStackTrace();
+            throw new RuntimeException("Error al cargar el mapa desde JSON", e);
         }
+    }
+
+    private void assignManualPositions() {
+        graphicPositions = new HashMap<>();
+
+        for (Node<Room> node : graph.getNodes()) {
+            String name = node.getData().getName();
+            double[] pos = getFixedPosition(name);
+
+            if (pos != null) {
+                graphicPositions.put(node.getData(), pos);
+            } else {
+                graphicPositions.put(node.getData(), new double[]{50, 50});
+            }
+        }
+
+        double maxX = 0, maxY = 0;
+        for (double[] pos : graphicPositions.values()) {
+            maxX = Math.max(maxX, pos[0]);
+            maxY = Math.max(maxY, pos[1]);
+        }
+        mapCanvas.setWidth(maxX + 100);
+        mapCanvas.setHeight(maxY + 100);
     }
 
     private void drawGraph() {
@@ -117,20 +142,14 @@ public class MapController {
             gc.setFill(Color.BLACK);
             gc.fillText(room.getName(), pos[0], pos[1] + 55);
         }
-    }
 
-    private void intentarMoverJugador(Room destino) {
-        if (destino.equals(playerPosition)) return;
+        double[] playerPos = graphicPositions.get(game.getPlayer().getPosition());
+        gc.setFill(Color.BLUE);
+        gc.fillOval(playerPos[0]+10, playerPos[1]+10, 20, 20);
 
-        List<Room> vecinos = graph.getNeighbors(playerPosition);
-
-        if (vecinos.contains(destino)) {
-            playerPosition = destino;
-            drawGraph();
-            System.out.println("Jugador se movió a: " + destino.getName());
-        } else {
-            System.out.println("Movimiento inválido: no es vecino.");
-        }
+        double[] marlonPos = graphicPositions.get(game.getMarlon().getPosition());
+        gc.setFill(Color.RED);
+        gc.fillOval(marlonPos[0]+10, marlonPos[1]+10, 20, 20);
     }
 
     private double[] getFixedPosition(String name) {
@@ -143,74 +162,84 @@ public class MapController {
             case "af" -> new double[]{637.5,50};
             case "ag" -> new double[]{750,50};
             // ----------------------------------
-            case "zonaVerde_1" -> new double[]{50, 150};
-            case "bb" -> new double[]{164.2, 150};
-            case "cafeteria_1" -> new double[]{278.4, 150};
-            case "bd" -> new double[]{400,150};
-            case "be" -> new double[]{525,150};
-            case "cafeteria_3" -> new double[]{637.5,150};
-            case "bg" -> new double[]{750,150};
+            case "zonaverde_1" -> new double[]{50, 120};
+            case "bb" -> new double[]{164.2, 120};
+            case "cafeteria_1" -> new double[]{278.4, 120};
+            case "bd" -> new double[]{400,120};
+            case "be" -> new double[]{525,120};
+            case "cafeteria_3" -> new double[]{637.5,120};
+            case "bg" -> new double[]{750,120};
             // -----------------------------------
-            case "ca" -> new double[]{50, 250};
-            case "cb" -> new double[]{164.2, 250};
-            case "cc" -> new double[]{278.4, 250};
-            case "cd" -> new double[]{400,250};
-            case "ce" -> new double[]{525,250};
-            case "cf" -> new double[]{637.5,250};
-            case "cg" -> new double[]{750, 250};
+            case "ca" -> new double[]{50, 190};
+            case "cb" -> new double[]{164.2, 190};
+            case "cc" -> new double[]{278.4, 190};
+            case "cd" -> new double[]{400,190};
+            case "ce" -> new double[]{525,190};
+            case "cf" -> new double[]{637.5,190};
+            case "cg" -> new double[]{750, 190};
             // ------------------------------------
-            case "da" -> new double[]{50, 350};
-            case "zonaVerde_2" -> new double[]{164.2, 350};
-            case "dc" -> new double[]{278.4, 350};
-            case "zonaVerde_3" -> new double[]{400, 350};
-            case "de" -> new double[]{525, 350};
-            case "df" -> new double[]{637.5, 350};
-            case "zonaVerde_4" -> new double[]{750,350};
+            case "da" -> new double[]{50, 260};
+            case "zonaverde_2" -> new double[]{164.2, 260};
+            case "dc" -> new double[]{278.4, 260};
+            case "zonaverde_3" -> new double[]{400, 260};
+            case "de" -> new double[]{525, 260};
+            case "df" -> new double[]{637.5, 260};
+            case "zonaverde_4" -> new double[]{750,260};
             // ------------------------------------
-            case "ea" -> new double[]{50, 450};
-            case "eb" -> new double[]{164.2, 450};
-            case "boreal" -> new double[]{278.4, 450};
-            case "ed" -> new double[]{400,450};
-            case "gym" -> new double[]{525,450};
-            case "ef" -> new double[]{637.5,450};
-            case "eg" -> new double[]{750,450};
+            case "ea" -> new double[]{50, 330};
+            case "eb" -> new double[]{164.2, 330};
+            case "boreal" -> new double[]{278.4, 330};
+            case "ed" -> new double[]{400,330};
+            case "gym" -> new double[]{525,330};
+            case "ef" -> new double[]{637.5,330};
+            case "eg" -> new double[]{750,330};
             //----------------------------------
-            case "fa" -> new double[]{50, 650};
-            case "biblioteca" -> new double[]{164.2, 650};
-            case "fc" -> new double[]{278.4, 650};
-            case "fd" -> new double[]{400, 650};
-            case "oficina_1" -> new double[]{525, 650};
-            case "ff" -> new double[]{637.5,650};
-            case "oficina_2" -> new double[]{750, 650};
-            case "oficina_3" -> new double[]{50, 650};
+            case "fa" -> new double[]{50, 400};
+            case "biblioteca" -> new double[]{164.2, 400};
+            case "fc" -> new double[]{278.4, 400};
+            case "fd" -> new double[]{400, 400};
+            case "oficina_1" -> new double[]{525, 400};
+            case "ff" -> new double[]{637.5,400};
+            case "oficina_2" -> new double[]{750,400};
             // ---------------------------------------
-            case "gb" -> new double[]{164.2, 750};
-            case "gc" -> new double[]{278.4, 750};
-            case "gd" -> new double[]{400, 750};
-            case "ge" -> new double[]{525, 750};
-            case "gf" -> new double[]{637.5, 750};
-            case "gg" -> new double[]{750, 750};
-            case "salida" -> new double[]{400, 850};
+            case "oficina_3" -> new double[]{50, 470};
+            case "gb" -> new double[]{164.2, 470};
+            case "gc" -> new double[]{278.4, 470};
+            case "gd" -> new double[]{400, 470};
+            case "ge" -> new double[]{525, 470};
+            case "gf" -> new double[]{637.5, 470};
+            case "gg" -> new double[]{750, 470};
+            // -----------------------------------------
+            case "salida" -> new double[]{400, 590};
             default -> null;
         };
     }
 
-    private void assignManualPositions() {
-        graphicPositions = new HashMap<>();
+    private void moverJugador(Room destino) {
 
-        for (Node<Room> node : graph.getNodes()) {
-            String name = node.getData().getName();
-            double[] pos = getFixedPosition(name);
-
-            if (pos != null) {
-                graphicPositions.put(node.getData(), pos);
-            } else {
-                graphicPositions.put(node.getData(), new double[]{50, 50});
-            }
-        }
     }
 
-    private void moverJugador(String direccion) {
-        System.out.println("Mover jugador: " + direccion);
+    private void moverMarlon() {
+        Room playerRoom = game.getPlayer().getPosition();
+        Room marlonRoom = game.getMarlon().getPosition();
+
+        LinkedList<Room> path = Algorithms.bfs(graph, marlonRoom, playerRoom);
+
+        if (path.getSize() >= 2) {
+            try {
+                Room nextRoom = path.search(1);
+                game.getMarlon().setPosition(nextRoom);
+                System.out.println("Marlon se movió a: " + nextRoom.getName());
+
+                if (nextRoom.equals(playerRoom)) {
+                    System.out.println("¡Marlon atrapó al jugador!");
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        drawGraph();
     }
 }

@@ -28,18 +28,26 @@ public class Game {
     public void setPlayer(Player player) { this.player = player; }
 
     public void startGame() {
+        Room playerStart = map.getARandomRoom();
+        Room marlonStart;
 
-        // Esto es solo una idea de lo que primero se tiene que hacer, falta implementar Lógica
+        do {
+            marlonStart = map.getARandomRoom();
+        } while (playerStart.equals(marlonStart));
 
-        setPlayer(new Player(map.getARandomRoom(), Constants.MAX_SCORE));
-        setMarlon(new Marlon(map.getARandomRoom()));
-        map.assignTrapsAndClues(Constants.TRAPS, Constants.CLUES);
+        this.player = new Player(playerStart, maxScore);
+        this.marlon = new Marlon(marlonStart);
+        this.map.assignTrapsAndClues(Constants.TRAPS, Constants.CLUES);
     }
 
     public void endGame() {
         /*
         ADD THE LOGIC
          */
+    }
+
+    public boolean isValidMove(Room from, Room to) {
+        return map.getGraph().hasEdge(from, to);
     }
 }
 

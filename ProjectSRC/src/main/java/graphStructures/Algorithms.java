@@ -3,7 +3,9 @@ package graphStructures;
 import java.util.*;
 
 import auxiliarStructures.*;
+import auxiliarStructures.LinkedList;
 import auxiliarStructures.Queue;
+import model.Room;
 
 public class Algorithms<T> {
 
@@ -28,29 +30,56 @@ public class Algorithms<T> {
     }
 
     // BFS
-    public List<T> bfs(WeightedGraph<T> graph, T start) {
-        List<T> visited = new ArrayList<>();
-        HashTable<T, Boolean> visitedMap = new HashTable<>();
-        Queue<T> queue = new Queue<>();
+    public static LinkedList<Room> bfs(WeightedGraph<Room> graph, Room start, Room goal) {
+        Map<Room, Room> cameFrom = new HashMap<>();
+        Queue<Room> queue = new Queue<>();
+        Set<Room> visited = new HashSet<>();
 
-        visitedMap.insert(start, true); // set as visited
         queue.enqueue(start);
+        visited.add(start);
+        cameFrom.put(start, null);
 
         while (!queue.isEmpty()) {
-            T current = queue.dequeue();
-            visited.add(current); // set actual node as visited
-            int currentIndex = graph.indexOfNodeValue(current);
-            if (currentIndex == -1) continue;
+            Room current = queue.dequeue();
+            if (current.equals(goal)) break;
 
-            for (Node<T> neighborNode : graph.getNodes().get(currentIndex).getAdjacent()) {
-                T neighbor = neighborNode.getData();
-                if (visitedMap.obtain(neighbor) == null) {
-                    visitedMap.insert(neighbor, true); // set neighbor as visited
-                    queue.enqueue(neighbor); // add the neighbor to the queue
+            for (Room neighbor : graph.getNeighbors(current)) {
+                if (!visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    cameFrom.put(neighbor, current);
+                    queue.enqueue(neighbor);
                 }
             }
         }
-        return visited;
+
+        LinkedList<Room> path = new LinkedList<>();
+        Room current = goal;
+
+        while (current != null) {
+            try {
+                path.insert(current);
+            } catch (Exception e) {
+            }
+            current = cameFrom.get(current);
+        }
+
+        LinkedList<Room> reversedPath = new LinkedList<>();
+        for (int i = path.getSize() - 1; i >= 0; i--) {
+            try {
+                reversedPath.insert(path.search(i));
+            } catch (Exception e) {
+            }
+        }
+
+        try {
+            if (reversedPath.getSize() > 0 && !reversedPath.search(0).equals(start)) {
+                return new LinkedList<>();
+            }
+        } catch (Exception e) {
+            return new LinkedList<>();
+        }
+
+        return reversedPath;
     }
 
     public DijkstraResult<T> dijkstraWithPaths(WeightedGraph<T> graph, T start) {
