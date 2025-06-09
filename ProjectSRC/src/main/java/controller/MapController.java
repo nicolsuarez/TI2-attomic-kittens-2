@@ -77,6 +77,8 @@ public class MapController {
 
     private void loadMapFromJson() {
         try {
+            System.out.println("Cargando JSON desde BuildMap");
+
             InputStream is = getClass().getResourceAsStream("/util/mapaJSON.json");
             if (is == null) {
                 throw new RuntimeException("No se encontró el archivo JSON");
@@ -91,6 +93,8 @@ public class MapController {
             graph = BuildMap.loadGraphFromJSON(tempFile.getAbsolutePath());
 
         } catch (Exception e) {
+            System.err.println("ERROR en loadMapFromJson()");
+            e.printStackTrace();
             throw new RuntimeException("Error al cargar el mapa desde JSON", e);
         }
     }

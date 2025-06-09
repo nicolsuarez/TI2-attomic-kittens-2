@@ -3,7 +3,6 @@ package model;
 import graphStructures.*;
 import resources.BuildMap;
 
-import java.io.InputStream;
 import java.util.List;
 
 public class GameMap {

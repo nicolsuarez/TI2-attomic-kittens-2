@@ -46,7 +46,7 @@ public class InstructionsController {
 
     @FXML
     void initialize() {
-        assert okeyButton != null : "fx:id=\"okeyButton\" was not injected: check your FXML file 'instructions_view.fxml'.";
+        assert okeyButton != null : "fx:id=\"okeyButton\" was not injected: check your FXML file 'InstructionsView.fxml'.";
 
     }
 
