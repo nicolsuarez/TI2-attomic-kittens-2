@@ -53,16 +53,17 @@ public class Algorithms<T> {
         return visited;
     }
 
-    // Dijkstra
-    public HashTable<T, Integer> dijkstra(WeightedGraph<T> graph, T start) {
+    public DijkstraResult<T> dijkstraWithPaths(WeightedGraph<T> graph, T start) {
         HashTable<T, Integer> dist = new HashTable<>();
         HashTable<T, Boolean> visited = new HashTable<>();
+        HashTable<T, T> previous = new HashTable<>();
         MinHeap<HeapNode<T>> minHeap = new MinHeap<>(
                 (a, b) -> Integer.compare(a.getPriority(), b.getPriority()));
 
         for (Node<T> node : graph.getNodes()) {
             dist.insert(node.getData(), Integer.MAX_VALUE);
         }
+
         dist.insert(start, 0);
         minHeap.add(new HeapNode<>(start, 0));
 
@@ -73,24 +74,49 @@ public class Algorithms<T> {
             if (visited.obtain(u) != null) continue;
             visited.insert(u, true);
 
-            // Using the method in WeightedGraph to get all the neighbors and their weight
             List<WeightedGraph.Pair<T, Integer>> neighbors = graph.getNeighborsWithWeights(u);
 
             for (WeightedGraph.Pair<T, Integer> neighbor : neighbors) {
                 T v = neighbor.first;
-                int pesoUV = neighbor.second;
+                int weightUV = neighbor.second;
 
                 if (visited.obtain(v) != null) continue;
 
-                int nuevaDist = dist.obtain(u) == Integer.MAX_VALUE ? Integer.MAX_VALUE : dist.obtain(u) + pesoUV;
-                if (nuevaDist < dist.obtain(v)) {
-                    dist.insert(v, nuevaDist);
-                    minHeap.add(new HeapNode<>(v, nuevaDist)); // finally adding the neighbor with the weight
+                int newDistance = dist.obtain(u) == Integer.MAX_VALUE ? Integer.MAX_VALUE : dist.obtain(u) + weightUV;
+                if (newDistance < dist.obtain(v)) {
+                    dist.insert(v, newDistance);
+                    previous.insert(v, u); // Guardar de dónde venimos
+                    minHeap.add(new HeapNode<>(v, newDistance));
                 }
             }
         }
-        return dist;
+
+        return new DijkstraResult<>(dist, previous);
     }
+
+    public class DijkstraResult<T> {
+        public HashTable<T, Integer> distances;
+        public HashTable<T, T> previous;
+
+        public DijkstraResult(HashTable<T, Integer> distances, HashTable<T, T> previous) {
+            this.distances = distances;
+            this.previous = previous;
+        }
+    }
+
+    public List<T> buildPath(HashTable<T, T> previous, T dest) {
+        List<T> path = new ArrayList<>();
+        T current = dest;
+
+        while (current != null) {
+            path.add(0, current); // Insertar al inicio
+            current = previous.obtain(current);
+        }
+
+        return path;
+    }
+
+
 
     // Floyd-Warshall (we are not using this, since our graph is made from an adjacency list)
     public int[][] floydWarshall(WeightedGraph<T> graph) {
